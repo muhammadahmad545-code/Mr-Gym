@@ -33,7 +33,7 @@ class _Stats {
 
 /// Monthly revenue, attendance trend and member counts, computed straight from payments and
 /// check-ins.
-Future<_Stats> loadStats(GymRepository repo, DateTime now) async {
+Future<_Stats> _loadStats(GymRepository repo, DateTime now) async {
   final t = dateOnly(now);
   final months = [for (var i = 5; i >= 0; i--) DateTime(t.year, t.month - i)];
   final payments = await repo.paymentsBetween(months.first, DateTime(t.year, t.month + 1));
@@ -62,7 +62,7 @@ class AnalyticsScreen extends StatelessWidget {
     final app = context.app;
     final p = context.basalt;
     return Live<_Stats>(
-      load: (repo) => loadStats(repo, DateTime.now()),
+      load: (repo) => _loadStats(repo, DateTime.now()),
       builder: (context, s) {
         final thisMonth = s.revenue.last;
         final lastMonth = s.revenue[s.revenue.length - 2];

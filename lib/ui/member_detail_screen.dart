@@ -301,8 +301,9 @@ class MemberDetailScreen extends StatelessWidget {
       ),
     );
     if (!context.mounted) return;
-    if (choice == 'receipt') await sendReceipt(context, app, m.member, pay);
-    if (choice == 'undo') {
+    if (choice == 'receipt') {
+      await sendReceipt(context, app, m.member, pay);
+    } else if (choice == 'undo') {
       final ok = await bConfirm(
         context,
         title: 'Undo this payment?',
