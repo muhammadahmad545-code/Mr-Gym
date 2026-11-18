@@ -1,4 +1,9 @@
 # Sourced by smoke.sh. End-to-end checks of Mr. Gym's main flows on the emulator.
+# Some keyboards ignore ESC; fall back to Back while the keyboard is still showing.
+hide_keyboard() {
+  adb shell input keyevent 111; sleep 1
+  if adb shell dumpsys input_method | grep -qE "mInputShown=true|isInputShown=true"; then adb shell input keyevent 4; sleep 1; fi
+}
 # Starts on Home after a relaunch.
 
 clear_field() { for i in $(seq 1 14); do adb shell input keyevent 67; done; }

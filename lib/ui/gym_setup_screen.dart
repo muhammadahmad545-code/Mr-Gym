@@ -59,7 +59,7 @@ class _GymSetupScreenState extends State<GymSetupScreen> {
         child: ListView(
           padding: const EdgeInsets.fromLTRB(Gap.xl, Gap.xxl, Gap.xl, Gap.xl),
           children: [
-            const BIconTile(Icons.fitness_center_rounded, size: 56),
+            const Align(alignment: Alignment.centerLeft, child: BIconTile(Icons.fitness_center_rounded, size: 56)),
             const SizedBox(height: Gap.xl),
             Text('Set up your gym', style: BasaltType.hero.copyWith(color: p.text)),
             const SizedBox(height: Gap.sm),
@@ -94,6 +94,7 @@ class _GymSetupScreenState extends State<GymSetupScreen> {
                     controller: _fee,
                     keyboardType: const TextInputType.numberWithOptions(decimal: true),
                     inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'[0-9.,]'))],
+                    textInputAction: TextInputAction.done,
                     decoration: const InputDecoration(labelText: 'Monthly fee', hintText: 'e.g. 3000'),
                     onSubmitted: (_) => _save(),
                   ),
