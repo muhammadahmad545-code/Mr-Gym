@@ -103,8 +103,9 @@ class HomeScreen extends StatelessWidget {
           children: [
             Expanded(
               child: BStatTile(
-                label: 'Check-ins today',
+                label: 'Check-ins',
                 value: '${d.checkins.length}',
+                hint: 'today',
                 icon: Icons.how_to_reg_rounded,
                 color: p.accent,
                 onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const CheckInScreen())),
@@ -113,8 +114,9 @@ class HomeScreen extends StatelessWidget {
             const SizedBox(width: Gap.md),
             Expanded(
               child: BStatTile(
-                label: 'Due this week',
+                label: 'Due soon',
                 value: '${d.dueSoon.length}',
+                hint: 'next 7 days',
                 icon: Icons.event_rounded,
                 color: p.warning,
                 onTap: () => openMembers(MemberFilter.due),
@@ -129,6 +131,7 @@ class HomeScreen extends StatelessWidget {
               child: BStatTile(
                 label: 'Overdue',
                 value: '${d.overdue.length}',
+                hint: 'unpaid fees',
                 icon: Icons.error_outline_rounded,
                 color: p.danger,
                 onTap: () => openMembers(MemberFilter.overdue),
@@ -137,11 +140,11 @@ class HomeScreen extends StatelessWidget {
             const SizedBox(width: Gap.md),
             Expanded(
               child: BStatTile(
-                label: 'Revenue this month',
+                label: 'Revenue',
                 value: app.money(d.revenue),
                 icon: Icons.payments_outlined,
                 color: p.success,
-                hint: '${d.payments} ${d.payments == 1 ? 'payment' : 'payments'}',
+                hint: 'this month · ${d.payments} paid',
               ),
             ),
           ],
@@ -240,5 +243,8 @@ class HomeScreen extends StatelessWidget {
   }
 }
 
-void openMember(BuildContext context, String id) =>
-    Navigator.of(context).push(MaterialPageRoute(builder: (_) => MemberDetailScreen(memberId: id)));
+void openMember(BuildContext context, String id) {
+  // Drop search focus so the keyboard does not pop back up on return.
+  FocusManager.instance.primaryFocus?.unfocus();
+  Navigator.of(context).push(MaterialPageRoute(builder: (_) => MemberDetailScreen(memberId: id)));
+}

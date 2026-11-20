@@ -72,9 +72,9 @@ class AnalyticsScreen extends StatelessWidget {
           children: [
             Row(
               children: [
-                Expanded(child: BStatTile(label: 'Active members', value: '${s.count(MemberFilter.active)}', icon: Icons.people_rounded, color: p.accent)),
+                Expanded(child: BStatTile(label: 'Active', value: '${s.count(MemberFilter.active)}', hint: 'members', icon: Icons.people_rounded, color: p.accent)),
                 const SizedBox(width: Gap.md),
-                Expanded(child: BStatTile(label: 'Joined this month', value: '${s.newThisMonth}', icon: Icons.person_add_alt_1_rounded, color: p.accent)),
+                Expanded(child: BStatTile(label: 'Joined', value: '${s.newThisMonth}', hint: 'this month', icon: Icons.person_add_alt_1_rounded, color: p.accent)),
               ],
             ),
             const SizedBox(height: Gap.md),
@@ -82,21 +82,21 @@ class AnalyticsScreen extends StatelessWidget {
               children: [
                 Expanded(
                   child: BStatTile(
-                    label: 'Collected this month',
+                    label: 'Collected',
                     value: app.money(thisMonth),
                     icon: Icons.payments_outlined,
                     color: p.success,
-                    hint: 'Last month ${app.money(lastMonth)}',
+                    hint: 'this month · last ${app.money(lastMonth)}',
                   ),
                 ),
                 const SizedBox(width: Gap.md),
                 Expanded(
                   child: BStatTile(
-                    label: 'Visits, 14 days',
+                    label: 'Visits',
                     value: '$totalVisits',
                     icon: Icons.how_to_reg_rounded,
                     color: p.accent,
-                    hint: '${(totalVisits / 14).toStringAsFixed(1)} a day',
+                    hint: '14 days · ${(totalVisits / 14).toStringAsFixed(1)}/day',
                   ),
                 ),
               ],

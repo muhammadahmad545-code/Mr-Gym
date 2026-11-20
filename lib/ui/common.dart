@@ -93,9 +93,9 @@ class InfoLine extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Expanded(child: Text(label, style: BasaltType.body.copyWith(color: p.textMuted, fontSize: 14))),
+          Text(label, style: BasaltType.body.copyWith(color: p.textMuted, fontSize: 14)),
           const SizedBox(width: Gap.md),
-          Flexible(
+          Expanded(
             child: Text(
               value,
               textAlign: TextAlign.end,

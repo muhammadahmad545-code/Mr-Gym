@@ -118,21 +118,23 @@ class MemberDetailScreen extends StatelessWidget {
 
   Widget _actions(BuildContext context, MemberView m, _Detail d) {
     final app = context.app;
-    Widget action(IconData icon, String label, VoidCallback? onTap) => Expanded(
+    Widget action(IconData icon, String label, VoidCallback? onTap, {String? semantics}) => Expanded(
           child: BCard(
             onTap: onTap,
-            semanticLabel: label,
+            semanticLabel: semantics ?? label,
             padding: const EdgeInsets.symmetric(vertical: Gap.md, horizontal: Gap.xs),
             child: Column(
               children: [
                 Icon(icon, color: onTap == null ? context.basalt.textFaint : context.basalt.accent),
                 const SizedBox(height: Gap.xs),
-                Text(
-                  label,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  textAlign: TextAlign.center,
-                  style: BasaltType.caption.copyWith(color: context.basalt.text, fontWeight: FontWeight.w500),
+                FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: Text(
+                    label,
+                    maxLines: 1,
+                    textAlign: TextAlign.center,
+                    style: BasaltType.caption.copyWith(color: context.basalt.text, fontWeight: FontWeight.w500),
+                  ),
                 ),
               ],
             ),
@@ -157,7 +159,7 @@ class MemberDetailScreen extends StatelessWidget {
                 },
         ),
         const SizedBox(width: Gap.sm),
-        action(Icons.payments_outlined, 'Record payment', () => showPaymentSheet(context, m)),
+        action(Icons.payments_outlined, 'Payment', () => showPaymentSheet(context, m), semantics: 'Record payment'),
         const SizedBox(width: Gap.sm),
         action(
           Icons.chat_outlined,
@@ -241,7 +243,7 @@ class MemberDetailScreen extends StatelessWidget {
       child: Column(
         children: [
           InfoLine('Plan', d.planName ?? 'Custom'),
-          InfoLine('Fee', '${app.money(m.member.fee)} / ${monthsLabel(m.member.planMonths)}'),
+          InfoLine('Fee', m.member.planMonths == 1 ? '${app.money(m.member.fee)} a month' : '${app.money(m.member.fee)} / ${monthsLabel(m.member.planMonths)}'),
           if (!m.isInactive) InfoLine('Next fee due', longDate(m.due), valueColor: statusColor(context, m)),
           InfoLine('Paid until', longDate(m.paidUntil)),
           InfoLine('Joined', longDate(tryParseYmd(m.member.joinedOn) ?? m.today)),

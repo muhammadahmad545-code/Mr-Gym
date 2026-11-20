@@ -6,16 +6,34 @@ hide_keyboard() {
 }
 # Starts on Home after a relaunch.
 
+# The emulator screen is small; scroll with coordinates relative to its real size.
+read -r W H <<<"$(adb shell wm size | grep -o '[0-9]*x[0-9]*' | tail -1 | tr x ' ')"
+W=${W:-1080}; H=${H:-1920}
+swipe_up() { adb shell input swipe $((W/2)) $((H*70/100)) $((W/2)) $((H*35/100)) 400; sleep 1; }
+scroll_to() {
+  for i in $(seq 1 10); do has_text "$1" && return 0; swipe_up; done
+  has_text "$1"
+}
+# Scroll until an exact label sits in the upper part of the screen (clear of the tab bar), then tap it.
+scroll_tap() {
+  for i in $(seq 1 10); do
+    dump; xy=$(_find exact "$1")
+    if [ -n "$xy" ] && [ "${xy#* }" -lt $((H*65/100)) ]; then adb shell input tap $xy; echo "tapped '$1' at $xy"; return 0; fi
+    swipe_up
+  done
+  return 1
+}
+
 clear_field() { for i in $(seq 1 14); do adb shell input keyevent 67; done; }
 pin() { for d in $(echo "$1" | grep -o .); do tap_text "$d" >/dev/null; done; }
 
 wait_for "Mark attendance" 20
-expect "Check-ins today 0" 10 "dashboard starts with no check-ins"
+expect "Check-ins 0" 10 "dashboard starts with no check-ins"
 
 # --- Add a member who has not paid yet -------------------------------------------------
 tap_text "Members"; sleep 2
 tap_text "Add member"; sleep 3
-expect "Full name" 10 "add-member form opens"
+expect "Save member" 10 "add-member form opens"
 tap_class EditText 0; type_text "Test Member"
 tap_class EditText 1; type_text "03001234567"
 hide_keyboard
@@ -29,8 +47,8 @@ alive || fail "app died after adding a member"
 
 # --- Dashboard sees the unpaid member ------------------------------------------------------
 tap_text "Home"; sleep 3
-expect "Due this week 1" 10 "dashboard counts the member as due"
-expect "Revenue this month Rs 0" 5 "no revenue before a payment"
+expect "Due soon 1" 10 "dashboard counts the member as due"
+expect "Revenue Rs 0" 5 "no revenue before a payment"
 shot e2e-2-home-due
 
 # --- Search ---------------------------------------------------------------------------------
@@ -56,12 +74,13 @@ expect "Payment saved" 5 "payment is saved"
 expect_not "No payments recorded yet" 1 "payment shows in the log"
 shot e2e-4-detail
 back; sleep 1
+hide_keyboard
 
 # --- Dashboard counts update ----------------------------------------------------------------
 tap_text "Home"; sleep 3
-expect "Check-ins today 1" 10 "dashboard counts the check-in"
-expect "Due this week 0" 5 "paid member no longer counts as due"
-expect "Revenue this month Rs 3,000" 5 "revenue includes the payment"
+expect "Check-ins 1" 10 "dashboard counts the check-in"
+expect "Due soon 0" 5 "paid member no longer counts as due"
+expect "Revenue Rs 3,000" 5 "revenue includes the payment"
 shot e2e-5-home-paid
 
 # --- Mark attendance from the front-desk screen ------------------------------------------------
@@ -75,8 +94,8 @@ back; sleep 1; back; sleep 1
 adb shell am force-stop "$PKG"; sleep 2
 launch
 wait_for "Mark attendance" 20
-expect "Check-ins today 1" 10 "check-in persists after relaunch"
-expect "Revenue this month Rs 3,000" 5 "payment persists after relaunch"
+expect "Check-ins 1" 10 "check-in persists after relaunch"
+expect "Revenue Rs 3,000" 5 "payment persists after relaunch"
 tap_text "Members"; sleep 2
 expect "Test Member" 10 "member persists after relaunch"
 tap_text "Test Member"; sleep 3
@@ -86,13 +105,12 @@ back; sleep 1
 
 # --- Analytics shows the payment --------------------------------------------------------------
 tap_text "Analytics"; sleep 3
-expect "Collected this month Rs 3,000" 8 "analytics counts this month's revenue"
+expect "Collected Rs 3,000" 8 "analytics counts this month's revenue"
 shot e2e-6-analytics
 
 # --- Optional PIN lock ------------------------------------------------------------------------
 tap_text "Settings"; sleep 2
-scroll_to "App lock" >/dev/null
-tap_text "App lock"; sleep 2
+scroll_tap "App lock"; sleep 2
 expect "Choose a PIN" 8 "PIN setup opens from Settings"
 pin 1234; tap_text "Next"; sleep 2
 expect "Confirm your PIN" 8 "PIN confirm step"
@@ -107,8 +125,7 @@ expect "Wrong PIN" 5 "wrong PIN is rejected"
 pin 1234; tap_text "Unlock"; sleep 4
 expect "Mark attendance" 10 "correct PIN unlocks"
 tap_text "Settings"; sleep 2
-scroll_to "App lock" >/dev/null
-tap_text "App lock"; sleep 2
+scroll_tap "App lock"; sleep 2
 expect "Enter your current PIN" 8 "turning the lock off asks for the PIN"
 pin 1234; tap_text "Continue"; sleep 4
 expect "App lock is off" 6 "app lock turned off"
