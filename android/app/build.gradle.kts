@@ -38,6 +38,12 @@ android {
             }
         }
     }
+    // Store native libraries compressed: a much smaller download.
+    packaging {
+        jniLibs {
+            useLegacyPackaging = true
+        }
+    }
     buildTypes {
         release {
             signingConfig = if (System.getenv("RELEASE_KEYSTORE_PATH") != null) signingConfigs.getByName("release") else signingConfigs.getByName("debug")
