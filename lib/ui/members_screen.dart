@@ -89,12 +89,15 @@ class _MembersScreenState extends State<MembersScreen> {
                     child: list.isEmpty
                         ? ListView(
                             children: [
-                              BEmptyState(
+                              Semantics(
+                                container: true,
+                                child: BEmptyState(
                               icon: members.isEmpty ? Icons.people_outline_rounded : Icons.search_off_rounded,
                               title: members.isEmpty
                                   ? 'No members yet'
                                   : (_query.isEmpty ? 'Nobody here' : 'No member matches "$_query"'),
-                                message: members.isEmpty ? 'Tap "Add member" to add your first member.' : null,
+                                  message: members.isEmpty ? 'Tap "Add member" to add your first member.' : null,
+                                ),
                               ),
                             ],
                           )

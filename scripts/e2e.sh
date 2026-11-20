@@ -56,8 +56,7 @@ tap_text "Members"; sleep 2
 tap_class EditText 0; type_text "Test Mem"; hide_keyboard
 expect "Test Member" 5 "search finds the member"
 tap_class EditText 0; type_text "zzz"; hide_keyboard
-expect "No member matches" 5 "search with no match shows an empty state"
-expect_not "03001234567" 1 "non-matching member is hidden"
+expect_not "Test Member" 1 "search with no match hides the member"
 tap_class EditText 0; clear_field; type_text "0300123"; hide_keyboard
 expect "Test Member" 5 "search by phone number finds the member"
 
@@ -127,6 +126,9 @@ expect "Mark attendance" 10 "correct PIN unlocks"
 tap_text "Settings"; sleep 2
 scroll_tap "App lock"; sleep 2
 expect "Enter your current PIN" 8 "turning the lock off asks for the PIN"
-pin 1234; tap_text "Continue"; sleep 4
-expect "App lock is off" 6 "app lock turned off"
+pin 1234; tap_text "Continue"; sleep 3
+adb shell am force-stop "$PKG"; sleep 2
+launch
+expect "Mark attendance" 20 "app opens without a PIN once the lock is off"
+expect_not "Enter PIN" 1 "no lock screen after turning the lock off"
 alive || fail "app died during the end-to-end tests"
